@@ -149,12 +149,14 @@ gg_gauge_half <- function(value, gMin, gMax, breaks, gColors, gName) {
 #' @param breaks Breaks for color areas
 #' @param gColors Colors for each break
 #' @param gName Name for the gauge (optional)
+#' @param nMajorTicks Number of major ticks (optional)
+#' @param nMinorTicks Number of minor ticks (optional - ideally should be a multiple of nMajorTicks)
 #' @export
 #' @examples
 #' gg_gauge_dial(1, 0, 2, breaks=c(1), gColors=c("green", "red"))
 #'
 #'
-gg_gauge_dial <- function(value, gMin, gMax, breaks, gColors, gName) {
+gg_gauge_dial <- function(value, gMin, gMax, breaks, gColors, gName, nMajorTicks, nMinorTicks) {
 
   if(max(breaks) > gMax || min(breaks) < gMin) {
     stop("Error: breaks are outside range of gauge")
@@ -234,11 +236,23 @@ gg_gauge_dial <- function(value, gMin, gMax, breaks, gColors, gName) {
   # from -0.05 to -0.15
 
   # major ticks
-  for(tick in 0:4) {
-    tickEnd <- circleFunction(tick * 67.5, 0.5, origin=225)
-    tick<-linesGrob(x=c(.5, tickEnd$x), y=c(.5, tickEnd$y), gp=gpar(lwd=5))
-    tick<-trimGrob(tick, from=-0.01, to=-0.18,gp=gpar(lwd=3))
-    gauge<-addGrob(gauge, tick)
+  if(!missing(nMajorTicks)) {
+    for(tick in 0:nMajorTicks) {
+      tickEnd <- circleFunction(tick * (270 / nMajorTicks), 0.5, origin=225)
+      tick<-linesGrob(x=c(.5, tickEnd$x), y=c(.5, tickEnd$y), gp=gpar(lwd=5))
+      tick<-trimGrob(tick, from=-0.01, to=-0.18,gp=gpar(lwd=3))
+      gauge<-addGrob(gauge, tick)
+    }
+  }
+
+  # major ticks
+  if(!missing(nMinorTicks)) {
+    for(tick in 0:nMinorTicks) {
+      tickEnd <- circleFunction(tick * (270 / nMinorTicks), 0.5, origin=225)
+      tick<-linesGrob(x=c(.5, tickEnd$x), y=c(.5, tickEnd$y), gp=gpar(lwd=5))
+      tick<-trimGrob(tick, from=-0.01, to=-0.10,gp=gpar(lwd=1))
+      gauge<-addGrob(gauge, tick)
+    }
   }
   return(gauge)
 }
