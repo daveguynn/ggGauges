@@ -66,6 +66,7 @@ gg_gauge_half <- function(value, gMin, gMax, breaks, gColors, gName) {
   if(max(breaks) > gMax || min(breaks) < gMin) {
     stop("Error: breaks are outside range of gauge")
   }
+
   # parameterize the value and breaks to "polar"
 
   degreeValue <- gg_gauge_relativePct(value, gMin, gMax) * 180
@@ -221,12 +222,24 @@ gg_gauge_dial <- function(value, gMin, gMax, breaks, gColors, gName) {
   valueText<-textGrob(value, x=0.5, y=0.2, gp=gpar(fontsize=48))
   gauge<-addGrob(gauge, valueText)
 
+  # draw the data point name
   if(!missing(gName)) {
 
     nameText<-textGrob(gName, x=0.5, y=0.65,gp=gpar(fontsize=18))
     gauge<-addGrob(gauge, nameText)
   }
 
+  # draw some rad tick marks
+  # thinking here draw a line from O to the point on the outer circle, then trimgrob
+  # from -0.05 to -0.15
+
+  # major ticks
+  for(tick in 0:4) {
+    tickEnd <- circleFunction(tick * 67.5, 0.5, origin=225)
+    tick<-linesGrob(x=c(.5, tickEnd$x), y=c(.5, tickEnd$y), gp=gpar(lwd=5))
+    tick<-trimGrob(tick, from=-0.01, to=-0.18,gp=gpar(lwd=3))
+    gauge<-addGrob(gauge, tick)
+  }
   return(gauge)
 }
 
