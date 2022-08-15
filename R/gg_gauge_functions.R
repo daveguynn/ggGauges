@@ -232,3 +232,28 @@ gg_gauge_dial <- function(value, gMin, gMax, breaks, gColors, gName) {
   return(gauge)
 }
 
+
+gg_gauge_layout <- function(.data, gMin, gMax, breaks, gColors) {
+  numGauges <-nrow(.data)
+  nRows <- ceiling(numGauges * .33)
+  print(nRows)
+  ggLayout <- viewport(layout=grid.layout(nrow=nRows, ncol = 3, widths=unit(2.5, "in"), height=unit(2.5, "in")))
+
+  pushViewport(ggLayout)
+
+  for(i in seq_along(.data$name)) {
+     iCol<- ceiling(i / 3)
+     iRow <- ((i-1) %% 3 ) + 1
+     #print(paste0(i, ":", iCol, ",", iRow))
+     pushViewport(viewport(layout.pos.row = iCol, layout.pos.col = iRow))
+
+     vp <- viewport(width = unit(0.8, "snpc"), height=unit(0.8, "snpc"), just="center")
+     pushViewport(vp)
+     grid.draw(gg_gauge_dial(.data[i,]$val, gMin, gMax, breaks, gColors, .data[i,]$name))
+     popViewport()
+     popViewport()
+  }
+}
+
+
+
